@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Spotify Song Search</title>
+</head>
+<body>
+    <h1>Create Your Playlist With Spotify</h1>
+    
+    <div>
+        <label for="song">What do you want to listen today?  :</label>
+        <input type="text" id="song" placeholder="Please Enter">
+    </div>
+    <button onclick="searchSong()">Search</button>
+    <div id="searchResults"></div>
+
+    <script>
+        async function searchSong() {
+            const songName = document.getElementById("song").value;
+            const artistName = document.getElementById("artist").value;
+            
+            try {
+                const response = await fetch("/search", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ songName, artistName }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("An error occurred while searching for the song.");
+                }
+
+                const data = await response.json();
+                const tracks = data;
+
+                let resultsHTML = "<h2>Search Results:</h2>";
+                resultsHTML += "<ul>";
+                tracks.forEach(track => {
+                    resultsHTML += `<li>${track.name} by ${track.artists[0].name} <button onclick="addToFavorite('${track.id}')">Add to Favorite</button></li>`;
+                });
+                resultsHTML += "</ul>";
+
+                document.getElementById("searchResults").innerHTML = resultsHTML;
+            } catch (error) {
+                console.error("Error searching song:", error);
+            }
+        }
+
+        async function addToFavorite(trackId) {
+            try {
+                const response = await fetch("/add-to-playlist", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ songId: trackId }),
+                });
+
+                if (response.ok) {
+                    alert("Song added to favorite songs!");
+                } else {
+                    alert("Error adding song to favorite songs!");
+                }
+            } catch (error) {
+                console.error("Error adding song to favorite:", error);
+            }
+        }
+    </script>
+</body>
+</html>
