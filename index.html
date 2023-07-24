@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Spotify : Create Your Favorite Playlist</title>
+</head>
+<body>
+  <h1>Spotify Add Songs Tou Your Playlist</h1>
+  <input type="text" id="searchQuery" placeholder="Please Enter...">
+  <button onclick="searchSongs()">Search</button>
+  <div id="searchResults"></div>
+  
+  <script>
+    const clientId = 'deb4ed7d2aa24afbb0f1da4c5b8119bc';
+    const clientSecret = '3c6c0e4459d040d2ace1bdb0b8294463';
+    const redirectUri = 'http://localhost:9090/callback';
+    const accessToken = 'BQA3uLxdX61m98iTHhvj-RZanaciNyItb8DXchtIPzYQGO4y25A8R4mKay2IYvx96lmJDEwPiezs0PbsgktHPuoPdZcgmMGUuLXiZMPVwbKU0ontxWY';
+
+    const searchSongs = () => {
+      const searchQuery = document.getElementById('searchQuery').value;
+      const searchOptions = {
+        url: `https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=track`,
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+        },
+      };
+
+      // API'den şarkıları arama
+      fetch(searchOptions.url, {
+        headers: searchOptions.headers,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Şarkılar listesini alıp sayfada gösterme
+          displaySongs(data.tracks.items);
+        })
+        .catch((error) => console.error('Error searching for track:', error));
+    };
+
+    const displaySongs = (songs) => {
+      const searchResultsDiv = document.getElementById('searchResults');
+      searchResultsDiv.innerHTML = ''; // Önceki sonuçları temizle
+
+      songs.forEach((song) => {
+        const songName = song.name;
+        const artistName = song.artists.map((artist) => artist.name).join(', ');
+        const albumName = song.album.name;
+
+        // Şarkıları listeleyerek kullanıcının seçmesini sağlayın
+        const songElement = document.createElement('div');
+        songElement.innerHTML = `<p>${songName} - ${artistName} (${albumName})</p>`;
+        songElement.addEventListener('click', () => addToFavoritePlaylist(song.uri)); // Şarkıya tıklandığında seçim
+        searchResultsDiv.appendChild(songElement);
+      });
+    };
+
+    const addToFavoritePlaylist = (trackUri) => {
+      const playlistId = '2yIwpw07FQRJgE9gTVX3zx'; // "favorite songs" playlistinin ID'si.
+      const accessToken = 'BQC3RRJxPu5k-p7t6cg4ZKAszY8h1sVStSfIFoMxOw27okGOU-pSfPRPHMTIPmJKRyZ8LdFf9xdPt8qaMjVWSg7t2aai8s73oJNMcWVV8kRMWbDS9sI'; // Bu değeri uygun şekilde doldurmanız gerekecek.
+
+      const addTrackOptions = {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uris: [trackUri] }),
+      };
+
+      // Şarkıyı "favorite songs" playlistine eklemek için isteği gönder
+      fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, addTrackOptions)
+        .then((response) => {
+          if (response.status === 201) {
+            console.log('Track added to playlist!');
+          } else {
+            console.error('Error adding track to playlist:', response.status);
+          }
+        })
+        .catch((error) => console.error('Error adding track to playlist:', error));
+    };
+  </script>
+</body>
+</html>
