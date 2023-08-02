@@ -2,18 +2,173 @@
 <html>
 <head>
   <title>Spotify : Create Your Favorite Playlist</title>
+  <link rel="stylesheet" type="text/css" href="styles.css?v=1">
+
+  <style>
+   html,
+body{
+    background: #f2e6ff;
+    font-family: 'Open Sans', sans-serif;
+  }
+h1{
+  color: rgb(168, 107, 233);
+  font-family: 'Raleway', sans-serif;
+  text-align: center;
+  
+}  
+button {
+    text-align: center;
+    align-items: center;
+    margin-left: 15px;  
+    height: 28px;
+    cursor: pointer;
+    font-size: 16px;
+    position: relative;
+    background-color: #fdfdfd;
+    border: #000;
+    color: #000000;
+    padding: 10px;
+    width: auto;
+    text-align: center;
+    transition-duration: 0.4s;
+    overflow: hidden;
+    box-shadow: 0 5px 15px #3e3075;
+    border-radius: 4px;
+    line-height: 0px;
+  }
+  button:hover {
+    background: #fff;
+    box-shadow: 0px 2px 10px 5px #8964ef;
+    color: #a85ef7;
+  }
+  button:after {
+    content: "";
+    background: #ac59f0;
+    display: block;
+    position: absolute;
+    padding-top: 300%;
+    padding-left: 350%;
+    margin-left: -200px !important;
+    margin-top: -120%;
+    opacity: 0;
+    transition: all 0.8s
+  }
+  button:active:after {
+    padding: 0;
+    margin: 0;
+    opacity: 1;
+    transition: 0s
+  }
+  
+  button:focus { 
+    outline: 0; 
+  }
+input[type="text"] {
+    border: 2px solid  rgb(56, 0, 128); 
+    color:  rgb(56, 0, 128);
+    font-family: 'Arial', sans-serif; 
+  }
+  .search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  input[type="text"] {
+    width: 150px; 
+    height: 28px;
+    font-size: medium;
+    border-radius: 12px;
+
+  }
+  button {
+    width: 110px;
+  }
+   .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  img {
+    width: 120px;
+    height: auto; 
+  }
+  h1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+    .add-button {
+      text-align: center;
+      align-items: center;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      position: relative;
+      background-color: #fdfdfd;
+      border: #000;
+      color: #000000;
+      padding: 10px;
+      width: auto;
+      text-align: center;
+      transition-duration: 0.4s;
+      overflow: hidden;
+      box-shadow: 0 5px 15px #3e3075;
+      border-radius: 4px;
+      line-height: 0px;
+    }
+
+    .add-button:hover {
+      background: #fff;
+      box-shadow: 0px 2px 10px 5px #8964ef;
+      color: #a85ef7;
+    }
+
+    .add-button:after {
+      content: "";
+      background: #ac59f0;
+      display: block;
+      position: absolute;
+      padding-top: 300%;
+      padding-left: 350%;
+      margin-left: -200px !important;
+      margin-top: -120%;
+      opacity: 0;
+      transition: all 0.8s
+    }
+
+    .add-button:active:after {
+      padding: 0;
+      margin: 0;
+      opacity: 1;
+      transition: 0s
+    }
+
+    .add-button:focus { 
+      outline: 0; 
+    }
+  </style>
+
 </head>
 <body>
-  <h1>Spotify Add Songs Tou Your Playlist</h1>
-  <input type="text" id="searchQuery" placeholder="Please Enter...">
-  <button onclick="searchSongs()">Search</button>
+  <div class="container">
+    <h1>Spotify Add Songs To Your Playlist <img src="resim.png" alt="Resim"></h1>
+  </div>
+  
+  <div class="search-container">
+    <input type="text" id="searchQuery" placeholder="Please Enter...">
+    <button onclick="searchSongs()">Search</button>
+  </div>
+
+  <div id="messageArea"></div>
   <div id="searchResults"></div>
   
   <script>
     const clientId = 'deb4ed7d2aa24afbb0f1da4c5b8119bc';
     const clientSecret = '3c6c0e4459d040d2ace1bdb0b8294463';
     const redirectUri = 'http://localhost:9090/callback';
-    const accessToken = 'BQA3uLxdX61m98iTHhvj-RZanaciNyItb8DXchtIPzYQGO4y25A8R4mKay2IYvx96lmJDEwPiezs0PbsgktHPuoPdZcgmMGUuLXiZMPVwbKU0ontxWY';
+    const accessToken = 'BQDCasrH00b_NN_ke4GEks-Ac2-AcE08_u7lX0UDAKvlPP6eMSfY3Qur28XUDm2eT_A5NfLDtpzy0Bsk2e937k-cwb1Izew0u0Zs3wZ9GTWPZrvE3DAa0ERRUZCcCoFHBZY8NPlQckps-UXBY08172peICvqHe9lbPGcdsOTor_7r7GbfWeSlTkFmAi-Nm1CoUxIGVeKCviSyhaznXZUk09JoGouhGfTdR0QF_HRQI_kreYA0YjUI7ULdnO8YiF9hyA';
 
     const searchSongs = () => {
       const searchQuery = document.getElementById('searchQuery').value;
@@ -31,7 +186,12 @@
         .then((response) => response.json())
         .then((data) => {
           // Şarkılar listesini alıp sayfada gösterme
-          displaySongs(data.tracks.items);
+          if (data.tracks.items.length === 0) {
+            showMessage('No songs found.');
+          } else {
+            showMessage('');
+            displaySongs(data.tracks.items);
+          }
         })
         .catch((error) => console.error('Error searching for track:', error));
     };
@@ -45,17 +205,26 @@
         const artistName = song.artists.map((artist) => artist.name).join(', ');
         const albumName = song.album.name;
 
-        // Şarkıları listeleyerek kullanıcının seçmesini sağlayın
+        // Şarkıları listeleyerek kullanıcının seçmesini
         const songElement = document.createElement('div');
         songElement.innerHTML = `<p>${songName} - ${artistName} (${albumName})</p>`;
-        songElement.addEventListener('click', () => addToFavoritePlaylist(song.uri)); // Şarkıya tıklandığında seçim
+
+        // Add butonunu oluştur
+        const addButton = document.createElement('button');
+        addButton.textContent = 'Add';
+        addButton.classList.add('add-button');
+        addButton.addEventListener('click', () => addToFavoritePlaylist(song.uri, songName, artistName));
+
+        // Şarkıyı ekrana ekle
+        songElement.appendChild(addButton);
         searchResultsDiv.appendChild(songElement);
       });
     };
 
-    const addToFavoritePlaylist = (trackUri) => {
-      const playlistId = '2yIwpw07FQRJgE9gTVX3zx'; // "favorite songs" playlistinin ID'si.
-      const accessToken = 'BQC3RRJxPu5k-p7t6cg4ZKAszY8h1sVStSfIFoMxOw27okGOU-pSfPRPHMTIPmJKRyZ8LdFf9xdPt8qaMjVWSg7t2aai8s73oJNMcWVV8kRMWbDS9sI'; // Bu değeri uygun şekilde doldurmanız gerekecek.
+    const addToFavoritePlaylist = (trackUri, songName, artistName) => {
+      const playlistId = '3HyLpgCvdI5TLDMXLrrvrP'; // "favorite songs" playlistinin ID'si.
+
+      console.log(trackUri)
 
       const addTrackOptions = {
         method: 'POST',
@@ -66,17 +235,29 @@
         body: JSON.stringify({ uris: [trackUri] }),
       };
 
+      console.log(accessToken)
       // Şarkıyı "favorite songs" playlistine eklemek için isteği gönder
       fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, addTrackOptions)
         .then((response) => {
+          console.log(response.message)
           if (response.status === 201) {
-            console.log('Track added to playlist!');
+            showMessage(`"${songName}" by ${artistName} added to playlist!`);
           } else {
-            console.error('Error adding track to playlist:', response.status);
+            showMessage(`Error adding "${songName}" by ${artistName} to playlist. Please try again later.`);
           }
         })
-        .catch((error) => console.error('Error adding track to playlist:', error));
+        .catch((error) => {
+          showMessage(`Error adding "${songName}" by ${artistName} to playlist. Please try again later.`);
+        });
+    };
+
+    const showMessage = (message) => {
+      const messageArea = document.getElementById('messageArea');
+      messageArea.textContent = message;
     };
   </script>
 </body>
 </html>
+
+
+  
